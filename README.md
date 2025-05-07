@@ -18,30 +18,47 @@ Built with only one dependency: [`python-telegram-bot`](https://github.com/pytho
 
 ## 🚀 Quick Start
 
-### 1. Clone this repository
+### 1. SSH into your server and prepare the directory
 
 ```bash
-git clone https://github.com/yourusername/obsidian-inbox-bot.git
-cd obsidian-inbox-bot
+ssh youruser@yourserver
+mkdir obsidian-telegram-bot
+cd obsidian-telegram-bot
 ```
 
-### 2. Create `.env` file
+### 2. Clone the repository
 
-Copy the example and fill in your values:
+```bash
+git clone https://github.com/fumblerill/obsidian-telegram-bot.git .
+```
+
+### 3. Add your private SSH key
+
+Place your SSH private key (with write access to your notes repository) into the server filesystem. For example:
+
+```bash
+mkdir -p /root/.ssh
+mv your_private_key /root/.ssh/obsidian_bot_ssh
+chmod 600 /root/.ssh/obsidian_bot_ssh
+```
+
+> ⚠️ This key must be in place **before building the Docker image**, as the image uses it to clone the Git repository.
+
+### 4. Create `.env` file
 
 ```bash
 cp .env.example .env
 ```
 
+Edit `.env`:
+
 ```env
 BOT_TOKEN=your_telegram_bot_token
 ALLOWED_IDS=123456789,987654321
-GIT_SSH_KEY_PATH=/root/.ssh/your_ssh_key
+GIT_SSH_KEY_PATH=/root/.ssh/obsidian_bot_ssh
 ```
 
-> ⚠️ Make sure the SSH key path is valid and that the key has write access to your Git repository.
-
-### 3. Build and run the bot
+### 5. Build and start the bot
 
 ```bash
 docker-compose up --build -d
