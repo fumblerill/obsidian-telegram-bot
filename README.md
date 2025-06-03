@@ -18,18 +18,16 @@ Built with only one dependency: [`python-telegram-bot`](https://github.com/pytho
 
 ## 🚀 Quick Start
 
-### 1. SSH into your server and prepare the directory
+### 1. SSH into your server
 
 ```bash
 ssh youruser@yourserver
-mkdir obsidian-telegram-bot
-cd obsidian-telegram-bot
 ```
 
 ### 2. Clone the repository
 
 ```bash
-git clone https://github.com/fumblerill/obsidian-telegram-bot.git .
+git clone https://github.com/fumblerill/obsidian-telegram-bot.git
 ```
 
 ### 3. Add your private SSH key
