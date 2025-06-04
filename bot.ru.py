@@ -67,7 +67,7 @@ async def git_commit_push(changed_file: str, update: Update = None):
     """
     Коммит и пуш нового файла в Git-репозиторий.
     """
-    ssh_key_path = os.getenv("GIT_SSH_KEY_PATH", "/root/.ssh/obsidian_bot_ssh")
+    ssh_key_path = "/root/.ssh/obsidian_bot_ssh"
     os.environ["GIT_SSH_COMMAND"] = f"ssh -i {ssh_key_path} -o StrictHostKeyChecking=no"
 
     repo_url = os.getenv("GIT_REPO_URL")
