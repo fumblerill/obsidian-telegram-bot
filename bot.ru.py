@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import shutil
 from datetime import datetime
 from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, ContextTypes
 from telegram import Update
@@ -71,13 +72,16 @@ async def git_commit_push(changed_file: str, update: Update = None):
 
     repo_url = os.getenv("GIT_REPO_URL")
     if not repo_url:
-        print("❌ GIT_REPO_URL не указан.")
+        print("❌ Переменная GIT_REPO_URL не указана.")
         return
 
     # Клонируем репозиторий, если он ещё не инициализирован
     if not os.path.isdir(os.path.join(FOLDER, ".git")):
         print("📥 Репозиторий не найден. Клонируем...")
         try:
+            if os.path.exists(FOLDER):
+                print(f"⚠️ Папка {FOLDER} уже существует. Удаляем её перед клонированием...")
+                shutil.rmtree(FOLDER)
             subprocess.run(["git", "clone", repo_url, FOLDER], check=True)
             print("✅ Репозиторий успешно клонирован.")
         except subprocess.CalledProcessError as e:
@@ -95,7 +99,7 @@ async def git_commit_push(changed_file: str, update: Update = None):
         print("📥 Делаем git pull --rebase...")
         subprocess.run(["git", "pull", "--rebase"], cwd=FOLDER, check=True)
 
-        print("📤 Отправляем на сервер...")
+        print("📤 Пушим в удалённый репозиторий...")
         subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=FOLDER, check=True)
         print("✅ Пуш выполнен.")
 

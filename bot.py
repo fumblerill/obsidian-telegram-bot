@@ -1,6 +1,7 @@
 import os
 import re
 import subprocess
+import shutil
 from datetime import datetime
 from telegram.ext import ApplicationBuilder, MessageHandler, CommandHandler, ContextTypes
 from telegram import Update
@@ -68,7 +69,7 @@ async def git_commit_push(changed_file: str, update: Update = None):
     """
     ssh_key_path = os.getenv("GIT_SSH_KEY_PATH", "/root/.ssh/obsidian_bot_ssh")
     os.environ["GIT_SSH_COMMAND"] = f"ssh -i {ssh_key_path} -o StrictHostKeyChecking=no"
-    
+
     repo_url = os.getenv("GIT_REPO_URL")
     if not repo_url:
         print("❌ GIT_REPO_URL is not set.")
@@ -78,6 +79,9 @@ async def git_commit_push(changed_file: str, update: Update = None):
     if not os.path.isdir(os.path.join(FOLDER, ".git")):
         print("📥 Repository not found. Cloning...")
         try:
+            if os.path.exists(FOLDER):
+                print(f"⚠️ Folder {FOLDER} exists, removing it before clone...")
+                shutil.rmtree(FOLDER)
             subprocess.run(["git", "clone", repo_url, FOLDER], check=True)
             print("✅ Repository successfully cloned.")
         except subprocess.CalledProcessError as e:
