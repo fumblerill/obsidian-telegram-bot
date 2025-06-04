@@ -42,8 +42,8 @@ Built with only one dependency: [`python-telegram-bot`](https://github.com/pytho
 4. **Edit the Dockerfile** if needed:
    - To switch between bot languages:
      ```dockerfile
-     COPY bot.py .      # English version
-     # COPY bot.ru.py . # Russian version
+     CMD ["python", "-u", "bot.py"]      # English version
+     # CMD ["python", "-u", "bot.ru.py"] . # Russian version
      ```
    - Set Git commit identity:
      ```dockerfile
