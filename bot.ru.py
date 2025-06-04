@@ -66,8 +66,26 @@ async def git_commit_push(changed_file: str, update: Update = None):
     """
     Коммит и пуш нового файла в Git-репозиторий.
     """
-    ssh_key_path = os.getenv("GIT_SSH_KEY_PATH", "/root/.ssh/id_rsa")
+    ssh_key_path = os.getenv("GIT_SSH_KEY_PATH", "/root/.ssh/obsidian_bot_ssh")
     os.environ["GIT_SSH_COMMAND"] = f"ssh -i {ssh_key_path} -o StrictHostKeyChecking=no"
+
+    repo_url = os.getenv("GIT_REPO_URL")
+    if not repo_url:
+        print("❌ GIT_REPO_URL не указан.")
+        return
+
+    # Клонируем репозиторий, если он ещё не инициализирован
+    if not os.path.isdir(os.path.join(FOLDER, ".git")):
+        print("📥 Репозиторий не найден. Клонируем...")
+        try:
+            subprocess.run(["git", "clone", repo_url, FOLDER], check=True)
+            print("✅ Репозиторий успешно клонирован.")
+        except subprocess.CalledProcessError as e:
+            error_msg = f"❌ Не удалось клонировать репозиторий: {e}"
+            print(error_msg)
+            if update:
+                await update.message.reply_text(error_msg)
+            return
 
     try:
         print(f"🧠 Коммитим файл: {changed_file}")

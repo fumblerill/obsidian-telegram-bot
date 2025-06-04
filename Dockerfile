@@ -14,12 +14,7 @@ RUN git config --global user.name "change_to_you"
 RUN git config --global user.email "you@mail.com"
 
 # Copy the bot source code
-COPY bot.py .
-
-# Clone the target notes repository using SSH
-ARG GIT_SSH_KEY_PATH
-ENV GIT_SSH_COMMAND="ssh -i ${GIT_SSH_KEY_PATH} -o StrictHostKeyChecking=no"
-RUN git clone git@github.com:your_name/your_repo.git InboxIdeas
+COPY . .
 
 # Start the bot
 CMD ["python", "-u", "bot.py"]

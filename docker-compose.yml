@@ -4,9 +4,9 @@ services:
   obsidian_bot:
     build:
       context: .
-      args:
-        GIT_SSH_KEY_PATH: ${GIT_SSH_KEY_PATH}
     container_name: obsidian_bot_container
     restart: unless-stopped
     env_file:
       - .env
+    volumes:
+      - ${GIT_SSH_KEY_PATH}:/root/.ssh/obsidian_bot_ssh:ro

@@ -66,8 +66,26 @@ async def git_commit_push(changed_file: str, update: Update = None):
     """
     Commit and push the new idea file to the Git repository.
     """
-    ssh_key_path = os.getenv("GIT_SSH_KEY_PATH", "/root/.ssh/id_rsa")
+    ssh_key_path = os.getenv("GIT_SSH_KEY_PATH", "/root/.ssh/obsidian_bot_ssh")
     os.environ["GIT_SSH_COMMAND"] = f"ssh -i {ssh_key_path} -o StrictHostKeyChecking=no"
+    
+    repo_url = os.getenv("GIT_REPO_URL")
+    if not repo_url:
+        print("❌ GIT_REPO_URL is not set.")
+        return
+
+    # Clone the repository if it's not initialized
+    if not os.path.isdir(os.path.join(FOLDER, ".git")):
+        print("📥 Repository not found. Cloning...")
+        try:
+            subprocess.run(["git", "clone", repo_url, FOLDER], check=True)
+            print("✅ Repository successfully cloned.")
+        except subprocess.CalledProcessError as e:
+            error_msg = f"❌ Failed to clone the repository: {e}"
+            print(error_msg)
+            if update:
+                await update.message.reply_text(error_msg)
+            return
 
     try:
         print(f"🧠 Committing file: {changed_file}")
