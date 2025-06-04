@@ -16,51 +16,45 @@ Built with only one dependency: [`python-telegram-bot`](https://github.com/pytho
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Deploy Instructions
 
-### 1. SSH into your server
+1. **Clone the repository** to your server:
+   ```bash
+   git clone git@github.com:yourname/obsidian-telegram-bot.git
+   cd obsidian-telegram-bot
+   ```
 
-```bash
-ssh youruser@yourserver
-```
+2. **Copy your SSH key** (with write access to the target notes repository) to your server.  
+   Example path: `/home/user/.ssh/obsidian_bot_ssh`
 
-### 2. Clone the repository
+3. **Create and edit the `.env` file**:
+   ```bash
+   cp .env.example .env
+   ```
+   Fill in the required variables:
+   ```
+   BOT_TOKEN=...
+   ALLOWED_IDS=...
+   GIT_REPO_URL=git@github.com:yourname/obsidian-inbox.git
+   GIT_SSH_KEY_PATH=/home/user/.ssh/obsidian_bot_ssh
+   ```
 
-```bash
-git clone https://github.com/fumblerill/obsidian-telegram-bot.git
-```
+4. **Edit the Dockerfile** if needed:
+   - To switch between bot languages:
+     ```dockerfile
+     COPY bot.py .      # English version
+     # COPY bot.ru.py . # Russian version
+     ```
+   - Set Git commit identity:
+     ```dockerfile
+     RUN git config --global user.name "Your Name"
+     RUN git config --global user.email "you@example.com"
+     ```
 
-### 3. Add your private SSH key
-
-Place your SSH private key (with write access to your notes repository) into the server filesystem. For example:
-
-```bash
-mkdir -p /root/.ssh
-mv your_private_key /root/.ssh/obsidian_bot_ssh
-chmod 600 /root/.ssh/obsidian_bot_ssh
-```
-
-> ⚠️ This key must be in place **before building the Docker image**, as the image uses it to clone the Git repository.
-
-### 4. Create `.env` file
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env`:
-
-```env
-BOT_TOKEN=your_telegram_bot_token
-ALLOWED_IDS=123456789,987654321
-GIT_SSH_KEY_PATH=/root/.ssh/obsidian_bot_ssh
-```
-
-### 5. Build and start the bot
-
-```bash
-docker-compose up --build -d
-```
+5. **Build and run** the container:
+   ```bash
+   docker-compose up --build -d
+   ```
 
 ---
 
