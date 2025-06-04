@@ -65,23 +65,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def git_commit_push(changed_file: str, update: Update = None):
     """
-    Коммит и пуш нового файла в Git-репозиторий.
+    Коммитим и отправляем новый файл идеи в Git-репозиторий.
     """
     ssh_key_path = "/root/.ssh/obsidian_bot_ssh"
     os.environ["GIT_SSH_COMMAND"] = f"ssh -i {ssh_key_path} -o StrictHostKeyChecking=no"
 
     repo_url = os.getenv("GIT_REPO_URL")
     if not repo_url:
-        print("❌ Переменная GIT_REPO_URL не указана.")
+        print("❌ Переменная GIT_REPO_URL не задана.")
         return
 
     # Клонируем репозиторий, если он ещё не инициализирован
     if not os.path.isdir(os.path.join(FOLDER, ".git")):
         print("📥 Репозиторий не найден. Клонируем...")
+        if os.path.isdir(FOLDER):
+            print(f"⚠️ Папка {FOLDER} уже существует. Удаляем её перед клонированием...")
+            subprocess.run(["rm", "-rf", FOLDER], check=True)
         try:
-            if os.path.exists(FOLDER):
-                print(f"⚠️ Папка {FOLDER} уже существует. Удаляем её перед клонированием...")
-                shutil.rmtree(FOLDER)
             subprocess.run(["git", "clone", repo_url, FOLDER], check=True)
             print("✅ Репозиторий успешно клонирован.")
         except subprocess.CalledProcessError as e:
@@ -93,15 +93,16 @@ async def git_commit_push(changed_file: str, update: Update = None):
 
     try:
         print(f"🧠 Коммитим файл: {changed_file}")
-        subprocess.run(["git", "add", changed_file], cwd=FOLDER, check=True)
+        relative_path = os.path.relpath(os.path.join(FOLDER, changed_file), start=FOLDER)
+        subprocess.run(["git", "add", relative_path], cwd=FOLDER, check=True)
         subprocess.run(["git", "commit", "-m", f"Добавлена идея: {changed_file}"], cwd=FOLDER, check=True)
 
-        print("📥 Делаем git pull --rebase...")
+        print("📥 Выполняем git pull --rebase...")
         subprocess.run(["git", "pull", "--rebase"], cwd=FOLDER, check=True)
 
         print("📤 Пушим в удалённый репозиторий...")
         subprocess.run(["git", "push", "origin", "HEAD:main"], cwd=FOLDER, check=True)
-        print("✅ Пуш выполнен.")
+        print("✅ Push завершён.")
 
     except subprocess.CalledProcessError as e:
         error_msg = f"❌ Ошибка Git: {e}"

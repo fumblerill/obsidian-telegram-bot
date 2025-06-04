@@ -78,10 +78,10 @@ async def git_commit_push(changed_file: str, update: Update = None):
     # Clone the repository if it's not initialized
     if not os.path.isdir(os.path.join(FOLDER, ".git")):
         print("📥 Repository not found. Cloning...")
+        if os.path.isdir(FOLDER):
+            print(f"⚠️ Folder {FOLDER} already exists. Removing it before cloning...")
+            subprocess.run(["rm", "-rf", FOLDER], check=True)
         try:
-            if os.path.exists(FOLDER):
-                print(f"⚠️ Folder {FOLDER} exists, removing it before clone...")
-                shutil.rmtree(FOLDER)
             subprocess.run(["git", "clone", repo_url, FOLDER], check=True)
             print("✅ Repository successfully cloned.")
         except subprocess.CalledProcessError as e:
@@ -93,7 +93,8 @@ async def git_commit_push(changed_file: str, update: Update = None):
 
     try:
         print(f"🧠 Committing file: {changed_file}")
-        subprocess.run(["git", "add", changed_file], cwd=FOLDER, check=True)
+        relative_path = os.path.relpath(os.path.join(FOLDER, changed_file), start=FOLDER)
+        subprocess.run(["git", "add", relative_path], cwd=FOLDER, check=True)
         subprocess.run(["git", "commit", "-m", f"Added idea: {changed_file}"], cwd=FOLDER, check=True)
 
         print("📥 Running git pull --rebase...")
